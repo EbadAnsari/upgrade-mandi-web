@@ -29,10 +29,17 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { Table, TableBody, TableHeader } from "@/components/ui/table";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RowBody, RowHeader } from "./Table/Row";
 
-const data: Payment[] = [
+export interface Payment {
+	id: string;
+	amount: number;
+	status: "pending" | "processing" | "success" | "failed";
+	email: string;
+}
+
+export const _data: Payment[] = [
 	{
 		id: "m5gr84i9",
 		amount: 316,
@@ -65,14 +72,7 @@ const data: Payment[] = [
 	},
 ];
 
-export type Payment = {
-	id: string;
-	amount: number;
-	status: "pending" | "processing" | "success" | "failed";
-	email: string;
-};
-
-export const columns: ColumnDef<Payment>[] = [
+export const _columns: ColumnDef<Payment>[] = [
 	{
 		id: "select",
 		header: ({ table }) => (
@@ -122,9 +122,7 @@ export const columns: ColumnDef<Payment>[] = [
 				</Button>
 			);
 		},
-		cell: ({ row }) => (
-			<div className="lowercase">{row.getValue("email")}</div>
-		),
+		cell: ({ row }) => <div>{row.getValue("email")}</div>,
 	},
 	{
 		accessorKey: "amount",
@@ -188,6 +186,9 @@ export default function TableEditor() {
 	);
 	const [rowSelection, setRowSelection] = useState({});
 
+	const [columns, setColumns] = useState<ColumnDef<Payment>[]>([]);
+	const [data, setData] = useState<Payment[]>([]);
+
 	const table = useReactTable({
 		data,
 		columns,
@@ -206,6 +207,14 @@ export default function TableEditor() {
 			rowSelection,
 		},
 	});
+
+	useEffect(() => {
+		setColumns(_columns);
+	}, [_columns]);
+
+	useEffect(() => {
+		setData(_data);
+	}, [_data]);
 
 	return (
 		<div className="w-full">
