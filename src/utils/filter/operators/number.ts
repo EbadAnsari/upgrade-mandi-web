@@ -7,6 +7,12 @@ export enum NumberOperators {
 	"lte" = "<=",
 }
 
+export interface NumberOperation {
+	type: "number";
+	numberOperator: NumberOperators;
+	filterValue: number;
+}
+
 export function evalNumber(
 	fieldValue: number,
 	operator: NumberOperators,

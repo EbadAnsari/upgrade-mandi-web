@@ -9,6 +9,13 @@ export enum StringOperators {
 	"notEndsWith" = "notEndsWith",
 }
 
+export interface StringOperation {
+	type: "string";
+	stringOperator: StringOperators;
+	filterValue: string;
+	caseSensitive: boolean;
+}
+
 export function evalString(
 	fieldValue: string,
 	operator: StringOperators,

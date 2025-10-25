@@ -24,7 +24,43 @@ export enum DateRelative {
 	"neq_day_of_week" = "neq_day_of_week",
 }
 
-export function evalDateEquality(
+export type DateOperation = {
+	type: "date";
+} & (
+	| {
+			dateOperationType: "equality";
+			dateOperator:
+				| DateEquality.eq
+				| DateEquality.neq
+				| DateEquality.after
+				| DateEquality.notAfter
+				| DateEquality.before
+				| DateEquality.before
+				| DateEquality.notBefore;
+			filterValue: Date;
+	  }
+	| {
+			dateOperationType: "range";
+			dateOperator: DateRange.between | DateRange.notBetween;
+			dateRangeStart: Date;
+			dateRangeEnd: Date;
+	  }
+	| {
+			dateOperationType: "relative";
+			dateOperator:
+				| DateRelative.eq_day
+				| DateRelative.neq_day
+				| DateRelative.eq_month
+				| DateRelative.neq_month
+				| DateRelative.eq_year
+				| DateRelative.neq_year
+				| DateRelative.eq_day_of_week
+				| DateRelative.neq_day_of_week;
+			filterValue: number;
+	  }
+);
+
+function evalDateEquality(
 	fieldValue: Date,
 	operator: DateEquality,
 	filterValue: Date
@@ -45,7 +81,7 @@ export function evalDateEquality(
 	}
 }
 
-export function evalDateRange(
+function evalDateRange(
 	fieldValue: Date,
 	operator: DateRange,
 	filterDateStart: Date,
@@ -65,7 +101,7 @@ export function evalDateRange(
 	}
 }
 
-export function evalDateRelative(
+function evalDateRelative(
 	fieldDate: Date,
 	operator: DateRelative,
 	filterValue: number
@@ -87,5 +123,29 @@ export function evalDateRelative(
 			return fieldDate.getDay() === filterValue;
 		case DateRelative.neq_day_of_week:
 			return fieldDate.getDay() !== filterValue;
+	}
+}
+
+export function evalDate(operation: DateOperation, fieldValue: Date) {
+	switch (operation.dateOperationType) {
+		case "equality":
+			return evalDateEquality(
+				fieldValue,
+				operation.dateOperator,
+				operation.filterValue
+			);
+		case "range":
+			return evalDateRange(
+				fieldValue,
+				operation.dateOperator,
+				operation.dateRangeStart,
+				operation.dateRangeEnd
+			);
+		case "relative":
+			return evalDateRelative(
+				fieldValue,
+				operation.dateOperator,
+				operation.filterValue
+			);
 	}
 }
