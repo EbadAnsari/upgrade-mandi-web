@@ -1,7 +1,7 @@
 import { Row } from "@tanstack/react-table";
 import { evalDate } from "./operators/date";
 import { evalNumber } from "./operators/number";
-import { evalSelect } from "./operators/status";
+import { evalStatus } from "./operators/status";
 import { evalString } from "./operators/string";
 import { BinaryOperation, Filter } from "./type";
 
@@ -26,9 +26,9 @@ function evaluate(
 		case "date":
 			return evalDate(operation, new Date(`${fieldValue}`));
 		case "select":
-			return evalSelect(
+			return evalStatus(
 				`${fieldValue}`,
-				operation.selectOperator,
+				operation.statusOperator,
 				operation.filterValue
 			);
 	}

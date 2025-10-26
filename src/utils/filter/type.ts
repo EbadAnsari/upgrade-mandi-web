@@ -1,18 +1,18 @@
-import { DateOperation } from "./operators/date";
-import { NumberOperation } from "./operators/number";
-import { SelectOperation } from "./operators/status";
-import { StringOperation } from "./operators/string";
+import { DateOperation, DateType } from "./operators/date";
+import { NumberOperation, NumberType } from "./operators/number";
+import { StatusOperation, StatusType } from "./operators/status";
+import { StringOperation, StringType } from "./operators/string";
 
 export type LogicalOperqator = "AND" | "OR";
 export type LogicalNegation = boolean | null | undefined;
 
-export type Datatype = "number" | "string" | "date" | "select";
+export type Datatype = NumberType | StringType | DateType | StatusType;
 
 export type BinaryOperation = { fieldId: string } & (
 	| NumberOperation
 	| StringOperation
 	| DateOperation
-	| SelectOperation
+	| StatusOperation
 );
 
 export type CurrentFilterId = string;

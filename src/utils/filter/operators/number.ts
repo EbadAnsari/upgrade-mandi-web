@@ -1,3 +1,8 @@
+export interface NumberType {
+	type: "number";
+	storedDatatype: number;
+}
+
 export enum NumberOperators {
 	"eq" = "=",
 	"neq" = "!=",
@@ -8,15 +13,15 @@ export enum NumberOperators {
 }
 
 export interface NumberOperation {
-	type: "number";
+	type: NumberType["type"];
 	numberOperator: NumberOperators;
-	filterValue: number;
+	filterValue: NumberType["storedDatatype"];
 }
 
 export function evalNumber(
-	fieldValue: number,
+	fieldValue: NumberType["storedDatatype"],
 	operator: NumberOperators,
-	filterValue: number
+	filterValue: NumberType["storedDatatype"]
 ): boolean {
 	if (typeof fieldValue !== "number")
 		throw new Error(

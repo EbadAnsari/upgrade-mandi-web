@@ -1,27 +1,28 @@
-export interface SelectType {
-	values: string[];
+export interface StatusType {
+	type: "select";
+	storedDatatype: string[];
 }
 
-export enum SelectOperators {
+export enum StatusOperators {
 	"selected" = "selected",
 	"notSelected" = "notSelected",
 }
 
-export interface SelectOperation {
-	type: "select";
-	selectOperator: SelectOperators;
-	filterValue: SelectType;
+export interface StatusOperation {
+	type: StatusType["type"];
+	statusOperator: StatusOperators;
+	filterValue: StatusType["storedDatatype"];
 }
 
-export function evalSelect(
+export function evalStatus(
 	fieldValue: string,
-	operator: SelectOperators,
-	filterValue: SelectType
+	operator: StatusOperators,
+	filterValue: StatusType["storedDatatype"]
 ): boolean {
 	switch (operator) {
-		case SelectOperators.selected:
-			return filterValue.values.includes(fieldValue);
-		case SelectOperators.notSelected:
-			return !filterValue.values.includes(fieldValue);
+		case StatusOperators.selected:
+			return filterValue.includes(fieldValue);
+		case StatusOperators.notSelected:
+			return !filterValue.includes(fieldValue);
 	}
 }

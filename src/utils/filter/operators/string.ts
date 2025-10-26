@@ -1,3 +1,8 @@
+export interface StringType {
+	type: "string";
+	storedDatatype: string;
+}
+
 export enum StringOperators {
 	"eq" = "=",
 	"neq" = "!=",
@@ -10,16 +15,16 @@ export enum StringOperators {
 }
 
 export interface StringOperation {
-	type: "string";
+	type: StringType["type"];
 	stringOperator: StringOperators;
-	filterValue: string;
+	filterValue: StringType["storedDatatype"];
 	caseSensitive: boolean;
 }
 
 export function evalString(
-	fieldValue: string,
+	fieldValue: StringType["storedDatatype"],
 	operator: StringOperators,
-	filterValue: string,
+	filterValue: StringType["storedDatatype"],
 	caseSensitive: boolean
 ) {
 	if (!caseSensitive) {

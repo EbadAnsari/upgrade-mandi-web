@@ -15,10 +15,14 @@ import {
 import { useState } from "react";
 
 export function useTableData<TData extends RowData>(
-	data: TData[],
-	columns: ColumnDef<TData>[]
+	columns: ColumnDef<TData>[],
+	data: TData[]
 ) {
 	const [globalFilter, setGlobalFilter] = useState<Filter | null>(null);
+
+	const [columnVisibility, setColumnVisibility] = useState<
+		Record<string, boolean>
+	>({});
 
 	function setFilter(filter: Filter | null) {
 		if (!filter) setGlobalFilter(null);
@@ -89,5 +93,16 @@ export function useTableData<TData extends RowData>(
 		removeFilter,
 	};
 
-	return { ...table, filterOperations };
+	function toggleVisibility(columnId: string) {
+		setColumnVisibility({
+			...columnVisibility,
+			[columnId]: !columnVisibility[columnId],
+		});
+	}
+
+	const visibility = {
+		toggleVisibility,
+	};
+
+	return { ...table, filterOperations, visibility };
 }

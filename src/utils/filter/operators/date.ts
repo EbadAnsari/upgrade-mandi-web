@@ -1,3 +1,8 @@
+export interface DateType {
+	type: "date";
+	storedDatatype: Date;
+}
+
 export enum DateEquality {
 	"eq" = "=",
 	"neq" = "!=",
@@ -25,7 +30,7 @@ export enum DateRelative {
 }
 
 export type DateOperation = {
-	type: "date";
+	type: DateType["type"];
 } & (
 	| {
 			dateOperationType: "equality";
@@ -61,9 +66,9 @@ export type DateOperation = {
 );
 
 function evalDateEquality(
-	fieldValue: Date,
+	fieldValue: DateType["storedDatatype"],
 	operator: DateEquality,
-	filterValue: Date
+	filterValue: DateType["storedDatatype"]
 ) {
 	switch (operator) {
 		case DateEquality.eq:
@@ -82,10 +87,10 @@ function evalDateEquality(
 }
 
 function evalDateRange(
-	fieldValue: Date,
+	fieldValue: DateType["storedDatatype"],
 	operator: DateRange,
-	filterDateStart: Date,
-	filterDateEnd: Date
+	filterDateStart: DateType["storedDatatype"],
+	filterDateEnd: DateType["storedDatatype"]
 ) {
 	switch (operator) {
 		case DateRange.between:
@@ -102,7 +107,7 @@ function evalDateRange(
 }
 
 function evalDateRelative(
-	fieldDate: Date,
+	fieldDate: DateType["storedDatatype"],
 	operator: DateRelative,
 	filterValue: number
 ) {
@@ -126,7 +131,10 @@ function evalDateRelative(
 	}
 }
 
-export function evalDate(operation: DateOperation, fieldValue: Date) {
+export function evalDate(
+	operation: DateOperation,
+	fieldValue: DateType["storedDatatype"]
+) {
 	switch (operation.dateOperationType) {
 		case "equality":
 			return evalDateEquality(

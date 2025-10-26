@@ -1,22 +1,20 @@
 "use client";
 
 import { ColumnDef, RowData } from "@tanstack/react-table";
-import {
-	createContext,
-	PropsWithChildren,
-	useContext,
-	useEffect,
-	useState,
-} from "react";
+import { createContext, PropsWithChildren, useContext } from "react";
 import { useTableData } from "../hooks/useTableEditor";
-import { _columns, _data, Payment } from "./data";
 
-export interface DatabaseProvidersProps<TData extends RowData>
-	extends PropsWithChildren {}
+export interface TableDataProvidersProps<TData extends RowData>
+	extends PropsWithChildren {
+	data: TData[];
+	columns: ColumnDef<TData>[];
+}
 
-export type TableDataContextValue = ReturnType<typeof useTableData<Payment>>;
+export type TableDataContextValue<TData extends RowData> = ReturnType<
+	typeof useTableData<TData>
+>;
 
-const TableDataContext = createContext<TableDataContextValue | null>(null);
+const TableDataContext = createContext<TableDataContextValue<any> | null>(null);
 
 export function useTableEditor() {
 	const context = useContext(TableDataContext);
@@ -29,24 +27,14 @@ export function useTableEditor() {
 
 export default function TableDataProviders<TData extends RowData>({
 	children,
-}: Readonly<DatabaseProvidersProps<TData>>) {
-	const [data, setData] = useState<Payment[]>([]);
-	const [columns, setColumns] = useState<ColumnDef<Payment>[]>([]);
-
-	const table = useTableData(data, columns);
-
-	useEffect(() => {
-		setColumns(_columns);
-	}, [_columns]);
-
-	useEffect(() => {
-		setData(_data);
-	}, [_data]);
+	data,
+	columns,
+}: Readonly<TableDataProvidersProps<TData>>) {
+	const table = useTableData(columns, data);
 
 	return (
 		<TableDataContext.Provider value={table}>
 			{children}
 		</TableDataContext.Provider>
 	);
-	// <DatabaseContext.Provider value={{}}>children</DatabaseContext.Provider>
 }
