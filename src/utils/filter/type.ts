@@ -1,12 +1,36 @@
-import { DateOperation, DateType } from "./operators/date";
-import { NumberOperation, NumberType } from "./operators/number";
-import { StatusOperation, StatusType } from "./operators/status";
-import { StringOperation, StringType } from "./operators/string";
+import { BooleanType } from "./operators/boolean";
+import {
+	DateEquality,
+	DateOperation,
+	DateRange,
+	DateRelative,
+	DateType,
+} from "./operators/date";
+import {
+	NumberOperation,
+	NumberOperators,
+	NumberType,
+} from "./operators/number";
+import {
+	StatusOperation,
+	StatusOperators,
+	StatusType,
+} from "./operators/status";
+import {
+	StringOperation,
+	StringOperators,
+	StringType,
+} from "./operators/string";
 
 export type LogicalOperqator = "AND" | "OR";
 export type LogicalNegation = boolean | null | undefined;
 
-export type Datatype = NumberType | StringType | DateType | StatusType;
+export type Datatype =
+	| NumberType
+	| StringType
+	| DateType
+	| BooleanType
+	| StatusType;
 
 export type BinaryOperation = { fieldId: string } & (
 	| NumberOperation
@@ -14,6 +38,14 @@ export type BinaryOperation = { fieldId: string } & (
 	| DateOperation
 	| StatusOperation
 );
+
+export type Operators =
+	| NumberOperators
+	| StringOperators
+	| DateEquality
+	| DateRelative
+	| DateRange
+	| StatusOperators;
 
 export type CurrentFilterId = string;
 export type FilterId = `${CurrentFilterId}-${string}` | "root";

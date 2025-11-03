@@ -34,24 +34,40 @@ function evaluate(
 	}
 }
 
+// 0 0 = 0
+// 0 1 = 1
+// 1 0 = 1
+// 1 1 = 0
+
 export function evaluateFilter<TData>(
 	filter: Filter | null,
 	row: Row<TData>,
 	columnId: string,
 	filterValue: Record<string, any>
 ): boolean {
+	const negation = Number(Boolean(filter?.negation));
 	if (!filter) return true;
 	if (!filter.logicalOperator)
-		return evaluate(
-			filter.operations,
-			row.getValue(filter.operations.fieldId)
+		return Boolean(
+			negation ^
+				Number(
+					evaluate(
+						filter.operations,
+						row.getValue(filter.operations.fieldId)
+					)
+				)
 		);
 
 	const result = filter.operations.map((operation) =>
 		evaluateFilter(operation, row, columnId, filterValue)
 	);
 
-	return filter.logicalOperator === "AND"
-		? result.every(Boolean)
-		: result.some(Boolean);
+	return Boolean(
+		negation ^
+			Number(
+				filter.logicalOperator === "AND"
+					? result.every(Boolean)
+					: result.some(Boolean)
+			)
+	);
 }

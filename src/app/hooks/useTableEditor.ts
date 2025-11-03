@@ -2,9 +2,9 @@ import { evaluateFilter } from "@/utils/filter/evaluateFilter";
 import { addFilterById, SameDiff } from "@/utils/filter/operations/add";
 import { removeFilterById } from "@/utils/filter/operations/remove";
 import { updateFilterById } from "@/utils/filter/operations/update";
+import { StringOperators } from "@/utils/filter/operators/string";
 import { Filter, FilterId, LogicalOperqator } from "@/utils/filter/type";
 import {
-	ColumnDef,
 	getCoreRowModel,
 	getFilteredRowModel,
 	getPaginationRowModel,
@@ -12,13 +12,24 @@ import {
 	RowData,
 	useReactTable,
 } from "@tanstack/react-table";
+import { nanoid } from "nanoid";
 import { useState } from "react";
+import { Schema } from "../components/ui/TableEditor";
 
 export function useTableData<TData extends RowData>(
-	columns: ColumnDef<TData>[],
+	columns: Schema<TData>[],
 	data: TData[]
 ) {
-	const [globalFilter, setGlobalFilter] = useState<Filter | null>(null);
+	const [globalFilter, setGlobalFilter] = useState<Filter | null>({
+		filterId: "root",
+		negation: true,
+		operations: {
+			type: "string",
+			stringOperator: StringOperators.eq,
+			filterValue: "ebad",
+			fieldId: "name",
+		},
+	});
 
 	const [columnVisibility, setColumnVisibility] = useState<
 		Record<string, boolean>
@@ -54,15 +65,15 @@ export function useTableData<TData extends RowData>(
 	});
 
 	function addFilter(
-		addToFilterId: FilterId,
 		filterToAdd: Filter,
 		logicalOperator: LogicalOperqator,
 		isLogicalOperatorSame: SameDiff
 	) {
+		const filterId: FilterId = globalFilter === null ? "root" : nanoid(6);
 		setFilter(
 			addFilterById(
 				globalFilter,
-				addToFilterId,
+				filterId,
 				filterToAdd,
 				logicalOperator,
 				isLogicalOperatorSame

@@ -9,27 +9,24 @@ import Pagination from "./Table/Pagination";
 import { RowBody, RowHeader } from "./Table/Row";
 
 export type Schema<TData extends RowData> = ColumnDef<TData> & {
-	type: Datatype;
-};
-
-export type TableData<TData extends RowData> = {
-	data: TData[];
-	schema: Schema<TData>[];
+	type: Datatype["type"];
 };
 
 interface TableEditorProps<TData extends RowData> {
-	tableData: TableData<TData>;
+	schema: Schema<TData>[];
+	data: TData[];
 }
 
 export default function TableEditor<TData extends RowData>({
-	tableData,
+	schema,
+	data,
 }: Readonly<TableEditorProps<TData>>) {
-	const table = useTableData(tableData.schema, tableData.data);
+	const table = useTableData(schema, data);
 
 	return (
 		<div className="w-full">
 			<div className="flex mb-4 w-min">
-				<FilterPopover />
+				<FilterPopover filter={table.filterOperations.filter} />
 			</div>
 			<div className="overflow-hidden rounded-md border">
 				<Table>

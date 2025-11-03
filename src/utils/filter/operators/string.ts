@@ -4,28 +4,25 @@ export interface StringType {
 }
 
 export enum StringOperators {
-	"eq" = "=",
-	"neq" = "!=",
+	"is" = "is",
+	"isNot" = "is not",
 	"contains" = "contains",
-	"startsWith" = "startsWith",
-	"endsWith" = "endsWith",
-	"notContains" = "notContains",
-	"notStartsWith" = "notStartsWith",
-	"notEndsWith" = "notEndsWith",
+	"startsWith" = "starts with",
+	"endsWith" = "ends with",
 }
 
 export interface StringOperation {
 	type: StringType["type"];
 	stringOperator: StringOperators;
 	filterValue: StringType["storedDatatype"];
-	caseSensitive: boolean;
+	caseSensitive?: boolean;
 }
 
 export function evalString(
 	fieldValue: StringType["storedDatatype"],
 	operator: StringOperators,
 	filterValue: StringType["storedDatatype"],
-	caseSensitive: boolean
+	caseSensitive?: boolean
 ) {
 	if (!caseSensitive) {
 		fieldValue = fieldValue.toLowerCase();
@@ -42,11 +39,5 @@ export function evalString(
 			return fieldValue.startsWith(filterValue);
 		case StringOperators.endsWith:
 			return fieldValue.endsWith(filterValue);
-		case StringOperators.notContains:
-			return !fieldValue.includes(filterValue);
-		case StringOperators.notStartsWith:
-			return !fieldValue.startsWith(filterValue);
-		case StringOperators.notEndsWith:
-			return !fieldValue.endsWith(filterValue);
 	}
 }

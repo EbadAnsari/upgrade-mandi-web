@@ -13,6 +13,8 @@ import { DatePicker } from "../DatePicker";
 import { Combobox } from "../ui/ComboBox";
 import TableEditor from "../ui/TableEditor";
 
+import { _columns, _data } from "./../../providers/data";
+
 export interface EditTableViewProps {}
 
 const formSchema = z.object({
@@ -114,7 +116,10 @@ export default function EditTableView({}: Readonly<EditTableViewProps>) {
 					/>
 				</div>
 				<div className="bg-white p-4 rounded-lg border border-zinc-200">
-					<TableEditor />
+					<TableEditor
+						schema={_columns}
+						data={_data}
+					/>
 				</div>
 			</form>
 		</Form>

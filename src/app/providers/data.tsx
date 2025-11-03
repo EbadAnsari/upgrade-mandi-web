@@ -10,8 +10,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { Schema } from "../components/ui/TableEditor";
 
 export interface Payment {
 	id: string;
@@ -20,9 +20,10 @@ export interface Payment {
 	email: string;
 }
 
-export const _columns: ColumnDef<Payment>[] = [
+export const _columns: Schema<Payment>[] = [
 	{
 		id: "select",
+		type: "boolean",
 		header: ({ table }) => (
 			<Checkbox
 				checked={
@@ -47,6 +48,7 @@ export const _columns: ColumnDef<Payment>[] = [
 	},
 	{
 		accessorKey: "status",
+		type: "select",
 		header: "Status",
 		cell: ({ row }) => (
 			<div className="capitalize">{row.getValue("status")}</div>
@@ -54,6 +56,7 @@ export const _columns: ColumnDef<Payment>[] = [
 	},
 	{
 		accessorKey: "email",
+		type: "string",
 		header: ({ column }) => {
 			return (
 				<Button
@@ -74,6 +77,7 @@ export const _columns: ColumnDef<Payment>[] = [
 	},
 	{
 		accessorKey: "amount",
+		type: "number",
 		header: () => <div className="text-right">Amount</div>,
 		cell: ({ row }) => {
 			const amount = parseFloat(row.getValue("amount"));
@@ -90,6 +94,7 @@ export const _columns: ColumnDef<Payment>[] = [
 	},
 	{
 		id: "actions",
+		type: "date",
 		enableHiding: false,
 		cell: ({ row }) => {
 			const payment = row.original;
