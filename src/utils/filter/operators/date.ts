@@ -1,20 +1,20 @@
-export interface DateType {
-	type: "date";
-	storedDatatype: Date;
+export class DateType {
+	name = "date" as const;
+	storedDatatype = new Date();
 }
 
-export enum DateEquality {
+export enum DateEqualityOperators {
 	"eq" = "=",
 	"neq" = "!=",
 	"after" = "after",
 	"before" = "before",
 }
 
-export enum DateRange {
+export enum DateRangeOperators {
 	"between" = "between",
 }
 
-export enum DateRelative {
+export enum DateRelativeOperators {
 	"eq_day" = "eq_day",
 	"eq_month" = "eq_month",
 	"eq_year" = "eq_year",
@@ -22,61 +22,69 @@ export enum DateRelative {
 	"eq_day_of_week" = "eq_day_of_week",
 }
 
+export enum DateOperationType {
+	"equality" = "equality",
+	"range" = "range",
+	"relative" = "relative",
+}
+
 export type DateOperation = {
-	type: DateType["type"];
+	type: DateType;
 } & (
 	| {
-			dateOperationType: "equality";
-			dateOperator:
-				| DateEquality.eq
-				| DateEquality.neq
-				| DateEquality.after
-				| DateEquality.before
-				| DateEquality.before;
+			dateOperationType: DateOperationType.equality;
+			operator:
+				| DateEqualityOperators.eq
+				| DateEqualityOperators.neq
+				| DateEqualityOperators.after
+				| DateEqualityOperators.before
+				| DateEqualityOperators.before;
 			filterValue: Date;
 	  }
 	| {
-			dateOperationType: "range";
-			dateOperator: DateRange.between;
-			dateRangeStart: Date;
-			dateRangeEnd: Date;
+			dateOperationType: DateOperationType.range;
+			operator: DateRangeOperators.between;
+			filterValue: {
+				dateRangeStart: Date;
+				dateRangeEnd: Date;
+			};
 	  }
 	| {
-			dateOperationType: "relative";
-			dateOperator:
-				| DateRelative.eq_day
-				| DateRelative.eq_month
-				| DateRelative.eq_year
-				| DateRelative.eq_day_of_week;
+			dateOperationType: DateOperationType.relative;
+			operator:
+				| DateRelativeOperators.eq_day
+				| DateRelativeOperators.eq_month
+				| DateRelativeOperators.eq_year
+				| DateRelativeOperators.eq_day_of_week;
 			filterValue: number;
 	  }
 );
 
 function evalDateEquality(
 	fieldValue: DateType["storedDatatype"],
-	operator: DateEquality,
+	operator: DateEqualityOperators,
 	filterValue: DateType["storedDatatype"]
 ) {
 	switch (operator) {
-		case DateEquality.eq:
+		case DateEqualityOperators.eq:
 			return fieldValue.getTime() === filterValue.getTime();
-		case DateEquality.neq:
+		case DateEqualityOperators.neq:
 			return fieldValue.getTime() !== filterValue.getTime();
-		case DateEquality.after:
+		case DateEqualityOperators.after:
 			return fieldValue.getTime() > filterValue.getTime();
-		case DateEquality.before:
+		case DateEqualityOperators.before:
 			return fieldValue.getTime() < filterValue.getTime();
 	}
 }
 
 function evalDateRange(
 	fieldValue: DateType["storedDatatype"],
-	operator: DateRange,
+	operator: DateRangeOperators,
 	filterDateStart: DateType["storedDatatype"],
 	filterDateEnd: DateType["storedDatatype"]
 ) {
 	switch (operator) {
-		case DateRange.between:
+		case DateRangeOperators.between:
 			return (
 				filterDateStart.getTime() <= fieldValue.getTime() &&
 				fieldValue.getTime() <= filterDateEnd.getTime()
@@ -86,17 +94,17 @@ function evalDateRange(
 
 function evalDateRelative(
 	fieldDate: DateType["storedDatatype"],
-	operator: DateRelative,
+	operator: DateRelativeOperators,
 	filterValue: number
 ) {
 	switch (operator) {
-		case DateRelative.eq_day:
+		case DateRelativeOperators.eq_day:
 			return fieldDate.getDate() === filterValue;
-		case DateRelative.eq_month:
+		case DateRelativeOperators.eq_month:
 			return fieldDate.getMonth() === filterValue;
-		case DateRelative.eq_year:
+		case DateRelativeOperators.eq_year:
 			return fieldDate.getFullYear() === filterValue;
-		case DateRelative.eq_day_of_week:
+		case DateRelativeOperators.eq_day_of_week:
 			return fieldDate.getDay() === filterValue;
 	}
 }
@@ -109,20 +117,20 @@ export function evalDate(
 		case "equality":
 			return evalDateEquality(
 				fieldValue,
-				operation.dateOperator,
+				operation.operator,
 				operation.filterValue
 			);
 		case "range":
 			return evalDateRange(
 				fieldValue,
-				operation.dateOperator,
-				operation.dateRangeStart,
-				operation.dateRangeEnd
+				operation.operator,
+				operation.filterValue.dateRangeStart,
+				operation.filterValue.dateRangeEnd
 			);
 		case "relative":
 			return evalDateRelative(
 				fieldValue,
-				operation.dateOperator,
+				operation.operator,
 				operation.filterValue
 			);
 	}

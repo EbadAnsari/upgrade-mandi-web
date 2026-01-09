@@ -1,6 +1,6 @@
 import { generateFilterId } from "../helper";
-import { getFilterById, isValidKey } from "../search";
-import { Filter, FilterId, LogicalOperqator } from "../type";
+import { Filter, FilterId, LogicalOperator } from "../type";
+import { getFilterById, isValidKey } from "./search";
 
 export type SameDiff = "same" | "diff";
 
@@ -8,7 +8,7 @@ export function addFilterById(
 	filterTree: Filter | null,
 	addToFilterId: FilterId,
 	filterToAdd: Filter,
-	logicalOperator: LogicalOperqator,
+	logicalOperator: LogicalOperator,
 	isLogicalOperatorSame: SameDiff
 ): Filter {
 	if (!filterTree) {

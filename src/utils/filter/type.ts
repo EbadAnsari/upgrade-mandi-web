@@ -1,58 +1,70 @@
-import { BooleanType } from "./operators/boolean";
-import {
-	DateEquality,
-	DateOperation,
-	DateRange,
-	DateRelative,
-	DateType,
-} from "./operators/date";
-import {
-	NumberOperation,
-	NumberOperators,
-	NumberType,
-} from "./operators/number";
-import {
-	StatusOperation,
-	StatusOperators,
-	StatusType,
-} from "./operators/status";
-import {
-	StringOperation,
-	StringOperators,
-	StringType,
-} from "./operators/string";
+import { DateOperation, DateType } from "./operators/date";
+import { NumberOperation, NumberType } from "./operators/number";
+import { SelectOperation, SelectType } from "./operators/select";
+import { TextOperation, TextType } from "./operators/text";
 
-export type LogicalOperqator = "AND" | "OR";
+export const LogicalOperatorArray = ["AND", "OR"] as const;
+export type LogicalOperator = (typeof LogicalOperatorArray)[number];
 export type LogicalNegation = boolean | null | undefined;
 
 export type Datatype =
 	| NumberType
-	| StringType
+	| TextType
 	| DateType
-	| BooleanType
-	| StatusType;
+	// | BooleanType
+	| SelectType<string>;
 
-export type BinaryOperation = { fieldId: string } & (
-	| NumberOperation
-	| StringOperation
-	| DateOperation
-	| StatusOperation
-);
+// const a: Datatype = {
+// 	name: "select",
+// 	storedDatatype: "",
+// 	possibleValues: [],
+// };
 
-export type Operators =
-	| NumberOperators
-	| StringOperators
-	| DateEquality
-	| DateRelative
-	| DateRange
-	| StatusOperators;
+export const columnTypes = {
+	id: new TextType(),
+	check: new NumberType(),
+	amount: new NumberType(),
+	status: new SelectType(["pending", "processing", "success", "failed"]),
+	email: new TextType(),
+	// actions: "more",
+} as const;
 
+export type ColumnTypes = typeof columnTypes;
+
+export type FilterValueType = BinaryOperation["filterValue"];
+
+type OperationForField<Field extends keyof ColumnTypes> =
+	ColumnTypes[Field] extends TextType
+		? TextOperation
+		: ColumnTypes[Field] extends NumberType
+		? NumberOperation
+		: ColumnTypes[Field] extends SelectType<string>
+		? SelectOperation<string>
+		: ColumnTypes[Field] extends DateType
+		? DateOperation
+		: never;
+
+export type BinaryOperation = {
+	[Field in keyof ColumnTypes]: {
+		id: Field;
+		type: ColumnTypes[Field];
+	} & OperationForField<Field>;
+}[keyof ColumnTypes];
+
+export type Operators = BinaryOperation["operator"];
+// | NumberOperators
+// | StringOperators
+// | DateOperation["operator"]
+// | SelectOperators;
+
+export type RootId = "root";
 export type CurrentFilterId = string;
-export type FilterId = `${CurrentFilterId}-${string}` | "root";
+export const FilterIdSeprator = "." as const;
+export type FilterId = `${CurrentFilterId}-${string}` | RootId;
 
-export type Filter = { negation?: LogicalNegation; filterId: string } & (
+export type Filter = { negation?: LogicalNegation; filterId: FilterId } & (
 	| {
-			logicalOperator: LogicalOperqator;
+			logicalOperator: LogicalOperator;
 			operations: Filter[];
 	  }
 	| {

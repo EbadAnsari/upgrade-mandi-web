@@ -1,9 +1,9 @@
-export interface StringType {
-	type: "string";
-	storedDatatype: string;
+export class TextType {
+	name = "text" as const;
+	storedDatatype = "";
 }
 
-export enum StringOperators {
+export enum TextOperators {
 	"is" = "is",
 	"isNot" = "is not",
 	"contains" = "contains",
@@ -11,17 +11,17 @@ export enum StringOperators {
 	"endsWith" = "ends with",
 }
 
-export interface StringOperation {
-	type: StringType["type"];
-	stringOperator: StringOperators;
-	filterValue: StringType["storedDatatype"];
+export interface TextOperation {
+	type: TextType;
+	operator: TextOperators;
+	filterValue: TextType["storedDatatype"];
 	caseSensitive?: boolean;
 }
 
 export function evalString(
-	fieldValue: StringType["storedDatatype"],
-	operator: StringOperators,
-	filterValue: StringType["storedDatatype"],
+	fieldValue: TextType["storedDatatype"],
+	operator: TextOperators,
+	filterValue: TextType["storedDatatype"],
 	caseSensitive?: boolean
 ) {
 	if (!caseSensitive) {
@@ -29,15 +29,15 @@ export function evalString(
 		filterValue = filterValue.toLowerCase();
 	}
 	switch (operator) {
-		case StringOperators.eq:
+		case TextOperators.is:
 			return fieldValue === filterValue;
-		case StringOperators.neq:
+		case TextOperators.isNot:
 			return fieldValue !== filterValue;
-		case StringOperators.contains:
+		case TextOperators.contains:
 			return fieldValue.includes(filterValue);
-		case StringOperators.startsWith:
+		case TextOperators.startsWith:
 			return fieldValue.startsWith(filterValue);
-		case StringOperators.endsWith:
+		case TextOperators.endsWith:
 			return fieldValue.endsWith(filterValue);
 	}
 }

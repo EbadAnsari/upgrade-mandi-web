@@ -2,15 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown } from "lucide-react";
 import { Schema } from "../components/ui/TableEditor";
 
 export interface Payment {
@@ -22,8 +14,9 @@ export interface Payment {
 
 export const _columns: Schema<Payment>[] = [
 	{
-		id: "select",
-		type: "boolean",
+		id: "check",
+		accessorKey: "check",
+		type: "number",
 		header: ({ table }) => (
 			<Checkbox
 				checked={
@@ -36,6 +29,7 @@ export const _columns: Schema<Payment>[] = [
 				aria-label="Select all"
 			/>
 		),
+		label: "Check",
 		cell: ({ row }) => (
 			<Checkbox
 				checked={row.getIsSelected()}
@@ -47,14 +41,17 @@ export const _columns: Schema<Payment>[] = [
 		enableHiding: false,
 	},
 	{
+		id: "status",
 		accessorKey: "status",
 		type: "select",
 		header: "Status",
 		cell: ({ row }) => (
 			<div className="capitalize">{row.getValue("status")}</div>
 		),
+		label: "Status",
 	},
 	{
+		id: "email",
 		accessorKey: "email",
 		type: "string",
 		header: ({ column }) => {
@@ -74,8 +71,10 @@ export const _columns: Schema<Payment>[] = [
 			);
 		},
 		cell: ({ row }) => <div>{row.getValue("email")}</div>,
+		label: "Email",
 	},
 	{
+		id: "amount",
 		accessorKey: "amount",
 		type: "number",
 		header: () => <div className="text-right">Amount</div>,
@@ -89,46 +88,49 @@ export const _columns: Schema<Payment>[] = [
 
 			return <div className="text-right font-medium">{formatted}</div>;
 		},
-		filterFn: (row, columnId, value: number) =>
-			parseFloat(row.getValue(columnId)) > value,
+		// filterFn: (row, columnId, value: number) =>
+		// 	parseFloat(row.getValue(columnId)) > value,
+		label: "Amount",
 	},
-	{
-		id: "actions",
-		type: "date",
-		enableHiding: false,
-		cell: ({ row }) => {
-			const payment = row.original;
+	// {
+	// 	id: "actions",
+	// 	accessorKey: "actions",
+	// 	type: "",
+	// 	enableHiding: false,
+	// 	cell: ({ row }) => {
+	// 		const payment = row.original;
 
-			return (
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button
-							variant="ghost"
-							className="h-8 w-8 p-0"
-						>
-							<span className="sr-only">Open menu</span>
-							<MoreHorizontal />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuLabel>Actions</DropdownMenuLabel>
-						<DropdownMenuItem
-							onClick={() =>
-								navigator.clipboard.writeText(payment.id)
-							}
-						>
-							Copy payment ID
-						</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem>View customer</DropdownMenuItem>
-						<DropdownMenuItem>
-							View payment details
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			);
-		},
-	},
+	// 		return (
+	// 			<DropdownMenu>
+	// 				<DropdownMenuTrigger asChild>
+	// 					<Button
+	// 						variant="ghost"
+	// 						className="h-8 w-8 p-0"
+	// 					>
+	// 						<span className="sr-only">Open menu</span>
+	// 						<MoreHorizontal />
+	// 					</Button>
+	// 				</DropdownMenuTrigger>
+	// 				<DropdownMenuContent align="end">
+	// 					<DropdownMenuLabel>Actions</DropdownMenuLabel>
+	// 					<DropdownMenuItem
+	// 						onClick={() =>
+	// 							navigator.clipboard.writeText(payment.id)
+	// 						}
+	// 					>
+	// 						Copy payment ID
+	// 					</DropdownMenuItem>
+	// 					<DropdownMenuSeparator />
+	// 					<DropdownMenuItem>View customer</DropdownMenuItem>
+	// 					<DropdownMenuItem>
+	// 						View payment details
+	// 					</DropdownMenuItem>
+	// 				</DropdownMenuContent>
+	// 			</DropdownMenu>
+	// 		);
+	// 	},
+	// 	label: "Actions",
+	// },
 ];
 
 export const _data: Payment[] = [

@@ -2,7 +2,7 @@
 
 import { ColumnDef, RowData } from "@tanstack/react-table";
 import { createContext, PropsWithChildren, useContext } from "react";
-import { useTableData } from "../hooks/useTableEditor";
+import { useTable } from "../hooks/useTableEditor";
 
 export interface TableDataProvidersProps<TData extends RowData>
 	extends PropsWithChildren {
@@ -11,7 +11,7 @@ export interface TableDataProvidersProps<TData extends RowData>
 }
 
 export type TableDataContextValue<TData extends RowData> = ReturnType<
-	typeof useTableData<TData>
+	typeof useTable<TData>
 >;
 
 const TableDataContext = createContext<TableDataContextValue<any> | null>(null);
@@ -30,7 +30,7 @@ export default function TableDataProviders<TData extends RowData>({
 	data,
 	columns,
 }: Readonly<TableDataProvidersProps<TData>>) {
-	const table = useTableData(columns, data);
+	const table = useTable(columns, data);
 
 	return (
 		<TableDataContext.Provider value={table}>

@@ -1,3 +1,5 @@
+import { CommandInput } from "@/components/ui/command";
+import { Input } from "@/components/ui/input";
 import {
 	Select,
 	SelectContent,
@@ -6,64 +8,54 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Check } from "lucide-react";
 import { useState } from "react";
-import { Item } from "./ComboBox";
+import { SelectProps } from "./ComboBox";
 
-export type SelectBoxProps = {
-	items: Item[];
-} & (
-	| { selectLabel: string; defaultValue?: null }
-	| { selectLabel?: null; defaultValue: string | number }
-);
-
-export default function SelectBox({
-	selectLabel,
-	items,
-	defaultValue,
-}: Readonly<SelectBoxProps>) {
-	const [selectedItem, changeSelection] = useState(
-		typeof defaultValue === "number"
-			? items[defaultValue]
-				? items[defaultValue]!
-				: { label: "", value: "" }
-			: items.find((item) => item.value === defaultValue) ?? {
-					label: "",
-					value: "",
-			  }
+function SelectInput({
+	className,
+	...props
+}: React.ComponentProps<typeof CommandInput>) {
+	return (
+		<Input
+			className={cn("w-full", className)}
+			{...props}
+		/>
 	);
+}
+
+export default function SelectBox<T extends string>({
+	items,
+	error,
+	icon,
+	label,
+	onChange,
+	selected,
+}: Readonly<SelectProps<T>>) {
+	const [selectedItem, changeSelection] = useState(selected ?? "");
 
 	return (
-		<Select>
+		<Select defaultValue={selected ?? undefined}>
 			<SelectTrigger className="bg-white focus-visible:border-transparent">
 				<SelectValue
-					placeholder={selectLabel}
+					placeholder={label}
 					className="capitalize"
 				/>
 			</SelectTrigger>
 			<SelectContent>
 				{items.map((item) => (
 					<SelectItem
-						key={item.value}
-						value={item.value}
+						key={String(item.value)}
+						value={String(item.value)}
 						className={`${
-							item.value === selectedItem?.value
+							item.value === selectedItem
 								? "bg-accent text-accent-foreground"
 								: ""
-						} capitalize`}
-						onClick={() => {
-							changeSelection(item);
+						} capitalize flex justify-between`}
+						onSelect={() => {
+							changeSelection(item.value);
 						}}
 					>
 						{item.label}
-						<Check
-							className={cn(
-								"ml-auto",
-								item.value === selectedItem.value
-									? "opacity-100"
-									: "opacity-0"
-							)}
-						/>
 					</SelectItem>
 				))}
 			</SelectContent>

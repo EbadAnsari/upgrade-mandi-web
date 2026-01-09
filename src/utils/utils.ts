@@ -3,5 +3,5 @@ export function extractKeysFromEnum(enumObject: any) {
 }
 
 export function extractValuesFromEnum(enumObject: any) {
-	return Object.values(enumObject).map((value) => value);
+	return Object.values(enumObject).map((value) => value) as string[];
 }

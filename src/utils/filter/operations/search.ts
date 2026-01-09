@@ -1,7 +1,17 @@
-import { Filter, FilterId } from "./type";
+import { Filter, FilterId, FilterIdSeprator } from "../type";
 
-export function getFilterById(filter: Filter, id: FilterId): Filter | null {
-	const filterIds = id.split("-");
+function throwFilterIdNotFound(filterId: FilterId): never {
+	throw new Error(`Filter id not found ${filterId}`);
+}
+
+export function getFilterById(filter: Filter, id: FilterId): Filter {
+	const __filter = __getFilterById(filter, id);
+	if (__filter === null) throwFilterIdNotFound(id);
+	return __filter;
+}
+
+export function __getFilterById(filter: Filter, id: FilterId): Filter | null {
+	const filterIds = id.split(FilterIdSeprator);
 	const currentFilterId = filterIds[0];
 
 	if (filter.filterId !== currentFilterId) return null;
@@ -12,7 +22,10 @@ export function getFilterById(filter: Filter, id: FilterId): Filter | null {
 	for (const operation of filter.operations) {
 		if (operation.filterId === filterId) {
 			filterIds.shift();
-			return getFilterById(operation, filterIds.join("-") as FilterId);
+			return getFilterById(
+				operation,
+				filterIds.join(FilterIdSeprator) as FilterId
+			);
 		}
 	}
 

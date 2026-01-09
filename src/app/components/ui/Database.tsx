@@ -5,9 +5,9 @@ import NavTab from "./NavTab";
 
 export function Database() {
 	return (
-		<section className="w-full flex justify-center">
-			<div className="container mx-4 flex min-h-screen flex-col p-4">
-				<h3 className="scroll-m-20 text-2xl font-semibold mb-4 tracking-tight">
+		<section className="flex justify-center w-full">
+			<div className="flex flex-col mx-4 p-4 min-h-screen container">
+				<h3 className="mb-4 font-semibold text-2xl tracking-tight scroll-m-20">
 					B2B
 				</h3>
 				<NavTab
@@ -19,7 +19,7 @@ export function Database() {
 						},
 						{
 							key: "view-2",
-							label: "Table View",
+							label: "Graph View",
 							content: "Hello World!",
 						},
 					]}

@@ -1,6 +1,6 @@
-export interface NumberType {
-	type: "number";
-	storedDatatype: number;
+export class NumberType {
+	name = "number" as const;
+	storedDatatype = 0;
 }
 
 export enum NumberOperators {
@@ -13,8 +13,8 @@ export enum NumberOperators {
 }
 
 export interface NumberOperation {
-	type: NumberType["type"];
-	numberOperator: NumberOperators;
+	type: NumberType;
+	operator: NumberOperators;
 	filterValue: NumberType["storedDatatype"];
 }
 

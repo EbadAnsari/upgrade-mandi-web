@@ -92,7 +92,8 @@ export function SideBar() {
 						>
 							<div className="w-full h-max flex ">
 								<div className="text-base tracking-tight font-medium uppercase">
-									upgrade mandi
+									upgrade{" "}
+									<span className="font-bold">mandi</span>
 								</div>
 								{/* <div className="font-light leading-1 uppercase">mandi</div> */}
 							</div>

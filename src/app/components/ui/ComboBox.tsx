@@ -1,14 +1,12 @@
 "use client";
 
 import { Check, ChevronsUpDown } from "lucide-react";
-import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import {
 	Command,
 	CommandEmpty,
 	CommandGroup,
-	CommandInput,
 	CommandItem,
 	CommandList,
 } from "@/components/ui/command";
@@ -18,19 +16,50 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { ReactNode, useEffect, useRef, useState } from "react";
+
+export interface BaseSelectorProps<T> {
+	selected?: T;
+	error?: boolean;
+	onChange?: (value: T) => void;
+}
 
 export interface Item {
 	value: string;
 	label: string;
 }
 
-interface ComboboxDemoProps {
+export interface SelectProps<T> extends Readonly<BaseSelectorProps<T>> {
 	items: Item[];
+	icon?: ReactNode;
+	label: string;
 }
 
-export function Combobox({ items }: ComboboxDemoProps) {
-	const [open, setOpen] = React.useState(false);
-	const [value, setValue] = React.useState("");
+interface ComboboxDemoProps<T> extends Readonly<SelectProps<T>> {
+	ComboInput?: ReactNode;
+}
+
+export function Combobox<T>({
+	icon,
+	error,
+	items,
+	label,
+	onChange,
+	ComboInput,
+	selected,
+}: ComboboxDemoProps<T>) {
+	const [open, setOpen] = useState(false);
+	const [value, setValue] = useState(selected ?? "");
+	const valueCheck = useRef(value);
+
+	useEffect(() => {
+		if (value !== valueCheck.current) {
+			onChange?.(value as T);
+		} else if (value !== selected) {
+			setValue(selected ?? "");
+		}
+		valueCheck.current = value;
+	});
 
 	return (
 		<Popover
@@ -39,31 +68,39 @@ export function Combobox({ items }: ComboboxDemoProps) {
 		>
 			<PopoverTrigger asChild>
 				<Button
-					variant="outline"
+					variant={error ? "destructive" : "outline"}
 					role="combobox"
 					aria-expanded={open}
-					className="w-[200px] justify-between"
+					className="justify-between"
 				>
+					{icon ? (
+						<div className="flex justify-center items-center rounded-xs size-3 font-display text-zinc-500 text-xs">
+							{icon}
+						</div>
+					) : null}
 					{value
 						? items.find((item) => item.value === value)?.label
-						: "Select framework..."}
+						: label}
 					<ChevronsUpDown className="opacity-50" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-[200px] p-0">
-				<Command>
-					<CommandInput
-						placeholder="Search framework..."
-						className="h-9"
-					/>
+			<PopoverContent
+				align="start"
+				className="p-0 w-[200px]"
+			>
+				<Command
+					defaultValue={
+						selected ?? items.length > 0 ? items[0].value : ""
+					}
+				>
+					{ComboInput}
 					<CommandList>
-						<CommandEmpty>No framework found.</CommandEmpty>
+						<CommandEmpty>Not found.</CommandEmpty>
 						<CommandGroup>
 							{items.map((item) => (
 								<CommandItem
 									key={item.value}
 									value={item.value}
-									// className="bg-zinc-100"
 									onSelect={(currentValue) => {
 										setValue(
 											currentValue === value

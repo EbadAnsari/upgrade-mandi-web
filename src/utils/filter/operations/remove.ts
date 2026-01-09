@@ -1,5 +1,5 @@
-import { getFilterById } from "../search";
 import { CurrentFilterId, Filter, FilterId } from "../type";
+import { getFilterById } from "./search";
 
 export function removeFilterById(
 	filterTree: Filter | null,

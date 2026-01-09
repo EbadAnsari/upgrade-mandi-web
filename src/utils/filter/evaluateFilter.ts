@@ -1,8 +1,8 @@
 import { Row } from "@tanstack/react-table";
 import { evalDate } from "./operators/date";
 import { evalNumber } from "./operators/number";
-import { evalStatus } from "./operators/status";
-import { evalString } from "./operators/string";
+import { evalStatus } from "./operators/select";
+import { evalString } from "./operators/text";
 import { BinaryOperation, Filter } from "./type";
 
 function evaluate(
@@ -13,13 +13,13 @@ function evaluate(
 		case "number":
 			return evalNumber(
 				parseFloat(`${fieldValue}`),
-				operation.numberOperator,
+				operation.operator,
 				operation.filterValue
 			);
 		case "string":
 			return evalString(
 				`${fieldValue}`,
-				operation.stringOperator,
+				operation.operator,
 				operation.filterValue,
 				operation.caseSensitive
 			);
@@ -28,7 +28,7 @@ function evaluate(
 		case "select":
 			return evalStatus(
 				`${fieldValue}`,
-				operation.statusOperator,
+				operation.operator,
 				operation.filterValue
 			);
 	}
@@ -53,7 +53,7 @@ export function evaluateFilter<TData>(
 				Number(
 					evaluate(
 						filter.operations,
-						row.getValue(filter.operations.fieldId)
+						row.getValue(filter.operations.id)
 					)
 				)
 		);
