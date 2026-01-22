@@ -1,18 +1,22 @@
 export class TextType {
-	name = "text" as const;
-	storedDatatype = "";
+	type = "text" as const;
+	storedDatatype: string = "";
+	possibleValues: string = "";
+
+	constructor(possibleValues: string = "") {
+		this.possibleValues = possibleValues;
+	}
 }
 
 export enum TextOperators {
 	"is" = "is",
-	"isNot" = "is not",
 	"contains" = "contains",
 	"startsWith" = "starts with",
 	"endsWith" = "ends with",
 }
 
 export interface TextOperation {
-	type: TextType;
+	type: TextType["type"];
 	operator: TextOperators;
 	filterValue: TextType["storedDatatype"];
 	caseSensitive?: boolean;
@@ -31,8 +35,6 @@ export function evalString(
 	switch (operator) {
 		case TextOperators.is:
 			return fieldValue === filterValue;
-		case TextOperators.isNot:
-			return fieldValue !== filterValue;
 		case TextOperators.contains:
 			return fieldValue.includes(filterValue);
 		case TextOperators.startsWith:

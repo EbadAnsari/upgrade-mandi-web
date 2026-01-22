@@ -1,5 +1,6 @@
 import { nanoid } from "nanoid";
+import { FilterId } from "./type";
 
-export function generateFilterId() {
-	return nanoid(4);
+export function generateFilterId(): FilterId {
+	return nanoid(6);
 }

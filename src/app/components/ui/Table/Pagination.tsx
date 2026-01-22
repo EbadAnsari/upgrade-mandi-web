@@ -1,16 +1,16 @@
+import { useTable } from "@/app/hooks/useTableEditor";
 import { Button } from "@/components/ui/button";
-import { RowData, Table } from "@tanstack/react-table";
+import { RowData } from "@tanstack/react-table";
 
-export interface PaginationProps<TData extends RowData> {
-	table: Table<TData>;
-}
+export interface PaginationProps<TData extends RowData> {}
 
-export default function Pagination<TData extends RowData>({
-	table,
-}: Readonly<PaginationProps<TData>>) {
+export default function Pagination<TData extends RowData>({}: Readonly<
+	PaginationProps<TData>
+>) {
+	const table = useTable();
 	return (
-		<div className="flex items-center justify-end space-x-2 py-4">
-			<div className="text-muted-foreground flex-1 text-sm">
+		<div className="flex justify-end items-center space-x-2 py-4">
+			<div className="flex-1 text-muted-foreground text-sm">
 				{table.getFilteredSelectedRowModel().rows.length} of{" "}
 				{table.getFilteredRowModel().rows.length} row(s) selected.
 			</div>

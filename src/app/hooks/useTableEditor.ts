@@ -1,6 +1,7 @@
 "use client";
 
 import { evaluateFilter } from "@/utils/filter/evaluateFilter";
+import { generateFilterId } from "@/utils/filter/helper";
 import { addFilterById, SameDiff } from "@/utils/filter/operations/add";
 import { removeFilterById } from "@/utils/filter/operations/remove";
 import {
@@ -10,7 +11,8 @@ import {
 	updateFilterLogicalOperatorById,
 	updateFilterOperatorById,
 } from "@/utils/filter/operations/update";
-import { NumberOperators, NumberType } from "@/utils/filter/operators/number";
+import { NumberOperators } from "@/utils/filter/operators/number";
+import { SelectOperators, SelectType } from "@/utils/filter/operators/select";
 import {
 	Filter,
 	FilterId,
@@ -27,12 +29,12 @@ import {
 	RowData,
 	useReactTable,
 } from "@tanstack/react-table";
-import { nanoid } from "nanoid";
 import { createContext, useContext, useState } from "react";
 import { Schema } from "../components/ui/TableEditor";
 
-export interface TableData<TData extends RowData>
-	extends ReturnType<typeof useTableData<TData>> {}
+export interface TableData<TData extends RowData> extends ReturnType<
+	typeof useTableData<TData>
+> {}
 
 export const TableContext = createContext<TableData<RowData> | null>(null);
 
@@ -45,83 +47,86 @@ export function useTable() {
 
 const filter: Filter = {
 	filterId: "root",
-	negation: true,
-	logicalOperator: "AND",
+	// filterId: generateFilterId(),
+	logicalOperator: "OR",
 	operations: [
 		{
-			filterId: nanoid(6) as FilterId,
-			logicalOperator: "OR",
+			filterId: generateFilterId(),
+			operations: {
+				type: "select",
+				// type: new SelectType([...Status]),
+				// kind: "select",
+				operator: SelectOperators.contains,
+				filterValue: SelectType.listToMap(["100"]),
+				id: "status",
+			},
+		},
+		{
+			filterId: generateFilterId(),
+			logicalOperator: "AND",
 			operations: [
 				{
-					filterId: nanoid(6) as FilterId,
+					filterId: generateFilterId(),
 					operations: {
-						type: new NumberType(),
-						operator: NumberOperators.eq,
+						type: "number",
+						operator: NumberOperators.gte,
 						filterValue: 100,
 						id: "amount",
 					},
 				},
-				{
-					filterId: nanoid(6) as FilterId,
-					operations: {
-						type: new NumberType(),
-						operator: NumberOperators.gte,
-						filterValue: 100,
-						id: "check",
-					},
-				},
 			],
 		},
-		// {
-		// 	filterId: nanoid(6) as FilterId,
-		// 	logicalOperator: "OR",
-		// 	operations: [
-		// 		{
-		// 			filterId: nanoid(6) as FilterId,
-		// 			operations: {
-		// 				type: "string",
-		// 				operator: StringOperators.contains,
-		// 				filterValue: "asdfa",
-		// 				id: "email",
-		// 			},
-		// 		},
-		// 		{
-		// 			filterId: nanoid(6) as FilterId,
-		// 			operations: {
-		// 				type: "number",
-		// 				operator: NumberOperators.gte,
-		// 				filterValue: 100,
-		// 				id: "amount",
-		// 			},
-		// 		},
-		// 	],
-		// },
-		// {
-		// 	filterId: nanoid(6) as FilterId,
-		// 	operations: {
-		// 		type: "number",
-		// 		operator: NumberOperators.gte,
-		// 		filterValue: 100,
-		// 		id: "amount",
-		// 	},
-		// },
-		// {
-		// 	filterId: nanoid(6) as FilterId,
-		// 	operations: {
-		// 		type: "number",
-		// 		operator: NumberOperators.gte,
-		// 		filterValue: 100,
-		// 		id: "amount",
-		// 	},
-		// },
 	],
+
+	// {
+	// 	filterId: generateFilterId(),
+	// 	logicalOperator: "OR",
+	// 	operations: [
+	// 		{
+	// 			filterId: generateFilterId(),
+	// 			operations: {
+	// 				type: "string",
+	// 				operator: StringOperators.contains,
+	// 				filterValue: "asdfa",
+	// 				id: "email",
+	// 			},
+	// 		},
+	// 		{
+	// 			filterId: generateFilterId(),
+	// 			operations: {
+	// 				type: "number",
+	// 				operator: NumberOperators.gte,
+	// 				filterValue: 100,
+	// 				id: "amount",
+	// 			},
+	// 		},
+	// 	],
+	// },
+	// {
+	// 	filterId: generateFilterId(),
+	// 	operations: {
+	// 		type: "number",
+	// 		operator: NumberOperators.gte,
+	// 		filterValue: 100,
+	// 		id: "amount",
+	// 	},
+	// },
+	// {
+	// 	filterId: generateFilterId(),
+	// 	operations: {
+	// 		type: "number",
+	// 		operator: NumberOperators.gte,
+	// 		filterValue: 100,
+	// 		id: "amount",
+	// 	},
+	// },
 };
 
 export function useTableData<TData extends RowData>(
 	columns: Schema<TData>[],
-	data: TData[]
+	data: TData[],
 ) {
-	const [globalFilter, setGlobalFilter] = useState<Filter | null>(filter);
+	const [globalFilter, setGlobalFilter] = useState<Filter | null>(null);
 
 	const [columnVisibility, setColumnVisibility] = useState<
 		Record<string, boolean>
@@ -144,12 +149,14 @@ export function useTableData<TData extends RowData>(
 		getFilteredRowModel: getFilteredRowModel(),
 
 		globalFilterFn(rows, columnId, filterValue, addMeta) {
-			return evaluateFilter<TData>(
+			const a = evaluateFilter<TData>(
 				globalFilter,
 				rows,
 				columnId,
-				filterValue
+				filterValue,
 			);
+			console.log(a);
+			return a;
 		},
 		state: {
 			globalFilter,
@@ -159,18 +166,18 @@ export function useTableData<TData extends RowData>(
 	function addFilter(
 		filterToAdd: Filter,
 		logicalOperator: LogicalOperator,
-		isLogicalOperatorSame: SameDiff
+		isLogicalOperatorSame: SameDiff,
 	) {
 		const filterId: FilterId =
-			globalFilter === null ? "root" : (nanoid(6) as FilterId);
+			globalFilter === null ? "root" : generateFilterId();
 		setFilter(
 			addFilterById(
 				globalFilter,
 				filterId,
 				filterToAdd,
 				logicalOperator,
-				isLogicalOperatorSame
-			)
+				isLogicalOperatorSame,
+			),
 		);
 	}
 
@@ -182,27 +189,26 @@ export function useTableData<TData extends RowData>(
 
 	function updateFilterFieldId(
 		updateToFilterId: FilterId,
-		fieldId: Pick<Schema<TData>, "id" | "type">
+		fieldId: Schema<TData>["id"],
 	) {
-		// console.log(globalFilter, updateToFilterId, fieldId, "before update");
 		const updatedFilter = updateFilterFieldIdById(
 			globalFilter,
 			updateToFilterId,
-			fieldId
+			fieldId,
+			columns,
 		);
-		// console.log(globalFilter, updateToFilterId, fieldId, "after update");
 		setFilter(updatedFilter[0]);
 		return updatedFilter[1];
 	}
 
 	function updateFilterOperator(
 		updateToFilterId: FilterId,
-		filterOperator: Operators
+		filterOperator: Operators,
 	) {
 		const updatedFilter = updateFilterOperatorById(
 			globalFilter,
 			updateToFilterId,
-			filterOperator
+			filterOperator,
 		);
 		setFilter(updatedFilter[0]);
 		return updatedFilter[1];
@@ -210,12 +216,12 @@ export function useTableData<TData extends RowData>(
 
 	function updateFilterLogicalOperator(
 		updateToFilterId: FilterId,
-		logicalOperator: LogicalOperator
+		logicalOperator: LogicalOperator,
 	) {
 		const updatedFilter = updateFilterLogicalOperatorById(
 			globalFilter,
 			updateToFilterId,
-			logicalOperator
+			logicalOperator,
 		);
 		setFilter(updatedFilter[0]);
 		return updatedFilter[1];
@@ -223,12 +229,12 @@ export function useTableData<TData extends RowData>(
 
 	function updateFilterLogicalNegation(
 		updateToFilterId: FilterId,
-		negation: LogicalNegation
+		negation: LogicalNegation,
 	) {
 		const updatedFilter = updateFilterLogicalNegationById(
 			globalFilter,
 			updateToFilterId,
-			negation
+			negation,
 		);
 		setFilter(updatedFilter[0]);
 		return updatedFilter[1];
@@ -236,13 +242,23 @@ export function useTableData<TData extends RowData>(
 
 	function updateFilterFieldValue(
 		updateToFilterId: FilterId,
-		value: FilterValueType
+		value: FilterValueType,
 	) {
 		const updatedFilter = updateFilterFieldValueById(
 			globalFilter,
 			updateToFilterId,
-			value
+			value,
 		);
+		setFilter(updatedFilter[0]);
+		return updatedFilter[1];
+	}
+
+	function getColumnById(columnId: Schema<TData>["id"]): Schema<TData> {
+		return columns.find((col) => col.id === columnId) as Schema<TData>;
+	}
+
+	function getColumnByType(type: Schema<TData>["type"]): Schema<TData>[] {
+		return columns.filter((col) => col.type === type);
 	}
 
 	const filterOperations = {
@@ -269,5 +285,11 @@ export function useTableData<TData extends RowData>(
 		toggleVisibility,
 	};
 
-	return { ...table, filterOperations, visibility };
+	const schema = {
+		columns,
+		getColumnById,
+		getColumnByType,
+	};
+
+	return { ...table, filterOperations, visibility, schema };
 }

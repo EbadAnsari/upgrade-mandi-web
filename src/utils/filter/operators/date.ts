@@ -1,6 +1,11 @@
 export class DateType {
-	name = "date" as const;
-	storedDatatype = new Date();
+	type = "date" as const;
+	storedDatatype: Date = new Date();
+	possibleValues: Date = new Date();
+
+	constructor(possibleValues: Date = new Date()) {
+		this.possibleValues = possibleValues;
+	}
 }
 
 export enum DateEqualityOperators {
@@ -29,7 +34,7 @@ export enum DateOperationType {
 }
 
 export type DateOperation = {
-	type: DateType;
+	type: DateType["type"];
 } & (
 	| {
 			dateOperationType: DateOperationType.equality;

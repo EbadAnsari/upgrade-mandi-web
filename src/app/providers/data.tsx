@@ -2,13 +2,18 @@
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { NumberType } from "@/utils/filter/operators/number";
+import { SelectType } from "@/utils/filter/operators/select";
+import { TextType } from "@/utils/filter/operators/text";
 import { ArrowUpDown } from "lucide-react";
 import { Schema } from "../components/ui/TableEditor";
+
+export const Status = ["pending", "processing", "success", "failed"] as const;
 
 export interface Payment {
 	id: string;
 	amount: number;
-	status: "pending" | "processing" | "success" | "failed";
+	status: (typeof Status)[number];
 	email: string;
 }
 
@@ -16,7 +21,8 @@ export const _columns: Schema<Payment>[] = [
 	{
 		id: "check",
 		accessorKey: "check",
-		type: "number",
+		type: new NumberType(),
+		// columnName: new NumberType(),
 		header: ({ table }) => (
 			<Checkbox
 				checked={
@@ -43,7 +49,7 @@ export const _columns: Schema<Payment>[] = [
 	{
 		id: "status",
 		accessorKey: "status",
-		type: "select",
+		type: new SelectType(["asf", "asfsaf", "asfasf"]),
 		header: "Status",
 		cell: ({ row }) => (
 			<div className="capitalize">{row.getValue("status")}</div>
@@ -53,7 +59,7 @@ export const _columns: Schema<Payment>[] = [
 	{
 		id: "email",
 		accessorKey: "email",
-		type: "string",
+		type: new TextType(),
 		header: ({ column }) => {
 			return (
 				<Button
@@ -76,7 +82,7 @@ export const _columns: Schema<Payment>[] = [
 	{
 		id: "amount",
 		accessorKey: "amount",
-		type: "number",
+		type: new NumberType(),
 		header: () => <div className="text-right">Amount</div>,
 		cell: ({ row }) => {
 			const amount = parseFloat(row.getValue("amount"));
@@ -86,7 +92,7 @@ export const _columns: Schema<Payment>[] = [
 				currency: "USD",
 			}).format(amount);
 
-			return <div className="text-right font-medium">{formatted}</div>;
+			return <div className="font-medium text-right">{formatted}</div>;
 		},
 		// filterFn: (row, columnId, value: number) =>
 		// 	parseFloat(row.getValue(columnId)) > value,
@@ -105,7 +111,7 @@ export const _columns: Schema<Payment>[] = [
 	// 				<DropdownMenuTrigger asChild>
 	// 					<Button
 	// 						variant="ghost"
-	// 						className="h-8 w-8 p-0"
+	// 						className="p-0 w-8 h-8"
 	// 					>
 	// 						<span className="sr-only">Open menu</span>
 	// 						<MoreHorizontal />

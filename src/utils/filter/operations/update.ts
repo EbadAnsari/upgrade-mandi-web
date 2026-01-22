@@ -5,7 +5,8 @@ import { NumberOperators } from "../operators/number";
 import { SelectOperators } from "../operators/select";
 import { TextOperators } from "../operators/text";
 import {
-	Datatype,
+	columnTypes,
+	ColumnTypes,
 	Filter,
 	FilterId,
 	FilterValueType,
@@ -23,22 +24,35 @@ function checkFilterTree(filterTree: Filter | null): filterTree is Filter {
 	return filterTree !== null;
 }
 
-function resetFilterValues(type: Datatype["name"]): FilterValueType {
+function resetFilterValues(columnName: keyof ColumnTypes): FilterValueType {
 	return {
 		text: "",
 		number: 0,
 		date: 0,
 		select: [],
-	}[type];
+	}[columnTypes[columnName]] as FilterValueType;
 }
 
-function resetOperator(type: Datatype["name"]): Operators {
+function resetOperator(columnName: keyof ColumnTypes): Operators {
 	return {
 		text: TextOperators.contains,
 		number: NumberOperators.eq,
 		date: DateEqualityOperators.eq,
-		select: SelectOperators.is,
-	}[type] as Operators;
+		select: SelectOperators.contains,
+	}[columnTypes[columnName]] as Operators;
+}
+
+function resetDataType<TData extends RowData>(
+	columns: Schema<TData>[],
+	columnName: keyof ColumnTypes
+): ColumnTypes[keyof ColumnTypes] {
+	return columns.reduce(
+		(acc, curr) => {
+			acc[curr.id] = curr.type.type as ColumnTypes[keyof ColumnTypes];
+			return acc;
+		},
+		{} as Record<string, ColumnTypes[keyof ColumnTypes]>
+	)[columnName];
 }
 
 /**
@@ -47,7 +61,8 @@ function resetOperator(type: Datatype["name"]): Operators {
 export function updateFilterFieldIdById<TData extends RowData>(
 	filterTree: Filter | null,
 	filterIdTree: FilterId,
-	fieldId: Pick<Schema<TData>, "id" | "type">
+	fieldId: Schema<TData>["id"],
+	columns: Schema<TData>[]
 ): [Filter | null, Filter] {
 	if (!checkFilterTree(filterTree)) throwFilterTreeIsNull(filterIdTree);
 
@@ -58,13 +73,17 @@ export function updateFilterFieldIdById<TData extends RowData>(
 	};
 
 	if (!toUpdateFilter.logicalOperator) {
-		toUpdateFilter.operations.id = fieldId.id;
-		toUpdateFilter.operations.type = fieldId.type;
+		toUpdateFilter.operations.id = fieldId;
+		// toUpdateFilter.operations.columnName = fieldId.columnName;
 		toUpdateFilter.operations.operator = resetOperator(
-			toUpdateFilter.operations.type.name
+			toUpdateFilter.operations.id
 		);
 		toUpdateFilter.operations.filterValue = resetFilterValues(
-			toUpdateFilter.operations.type.name
+			toUpdateFilter.operations.id
+		);
+		toUpdateFilter.operations.type = resetDataType(
+			columns,
+			toUpdateFilter.operations.id
 		);
 	}
 
@@ -86,9 +105,9 @@ export function updateFilterOperatorById(
 
 	if (toUpdateFilter.operations && !toUpdateFilter.logicalOperator) {
 		toUpdateFilter.operations.operator = operator;
-		toUpdateFilter.operations.filterValue = resetFilterValues(
-			toUpdateFilter.operations.type.name
-		);
+		// toUpdateFilter.operations.filterValue = resetFilterValues(
+		// 	toUpdateFilter.operations.id
+		// );
 	}
 
 	return [filterTree, toReturn];
@@ -143,6 +162,7 @@ export function updateFilterFieldValueById(
 		...toUpdateFilter,
 	};
 
+	// TODO: Handle logical operator case
 	if (!toUpdateFilter.logicalOperator)
 		toUpdateFilter.operations.filterValue = filterValue;
 

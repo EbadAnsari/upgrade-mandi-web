@@ -6,15 +6,17 @@ import {
 	useTableData,
 } from "@/app/hooks/useTableEditor";
 import { Table, TableBody, TableHeader } from "@/components/ui/table";
-import { BinaryOperation } from "@/utils/filter/type";
+import { BinaryOperation, Datatype } from "@/utils/filter/type";
 import { ColumnDef, RowData } from "@tanstack/react-table";
 import FilterPopover from "./Table/FilterComponent/FilterComponent";
 import Pagination from "./Table/Pagination";
-import { RowBody, RowHeader } from "./Table/Row";
+import { RowBody } from "./Table/row/RowBody";
+import { RowHeader } from "./Table/row/RowHeader";
 
 export type Schema<TData extends RowData> = ColumnDef<TData> &
-	Pick<BinaryOperation, "id" | "type"> & {
+	Pick<BinaryOperation, "id"> & {
 		label: string;
+		type: Datatype;
 	};
 
 interface TableEditorProps<TData extends RowData> {
@@ -39,17 +41,17 @@ export default function TableEditor<TData extends RowData>({
 					// table={table}
 					/>
 				</div>
-				<div className="overflow-hidden rounded-md border">
+				<div className="border rounded-md overflow-hidden">
 					<Table>
 						<TableHeader>
-							<RowHeader table={table} />
+							<RowHeader />
 						</TableHeader>
 						<TableBody>
-							<RowBody table={table} />
+							<RowBody />
 						</TableBody>
 					</Table>
 				</div>
-				<Pagination table={table} />
+				<Pagination />
 			</div>
 		</TableContext.Provider>
 	);

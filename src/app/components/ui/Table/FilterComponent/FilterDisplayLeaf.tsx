@@ -3,12 +3,12 @@
 import { useTable } from "@/app/hooks/useTableEditor";
 import { BinaryOperation, FilterId } from "@/utils/filter/type";
 import { RowData } from "@tanstack/react-table";
-import { Schema } from "../../TableEditor";
 import FilterColumnSelector from "./FilterColumnSelector";
 import FilterInput from "./FilterInput";
 import { FilterOperatorSelector } from "./FilterOperatorSelector";
+import NotToggle from "./NotToggle";
 
-interface FilterDisplayLeafProps<TData extends RowData> {
+interface FilterDisplayLeafProps {
 	filter: BinaryOperation;
 	filterId: FilterId;
 	filterIdMap: FilterId;
@@ -18,50 +18,49 @@ export function FilterDisplayLeaf<TData extends RowData>({
 	filter,
 	filterId,
 	filterIdMap,
-}: FilterDisplayLeafProps<TData>) {
+}: FilterDisplayLeafProps) {
 	const table = useTable();
 
 	const error = !table.getAllColumns().find((col) => col.id === filter.id);
 
+	// if (filter.id === "check") console.log(filter.filterValue);
+
 	return (
-		<div className="flex gap-2">
+		<div className="flex gap-2 bg-zinc-200/50 p-2 border border-zinc-300 rounded-lg">
+			<NotToggle />
 			<FilterColumnSelector
 				error={error}
-				type={filter.type.name}
+				type={filter.type}
 				selected={filter.id}
 				onChange={(fieldId) => {
-					const up = table.filterOperations.updateFilterFieldId(
+					table.filterOperations.updateFilterFieldId(
 						filterIdMap,
-						{
-							id: fieldId,
-							type: (
-								table.getColumn(fieldId)
-									?.columnDef as Schema<TData>
-							).type,
-						}
+						fieldId,
 					);
 				}}
 			/>
 
 			<FilterOperatorSelector
-				col={filter.id}
 				type={filter.type}
 				error={error}
 				selected={filter.operator}
 				onChange={(operator) => {
 					table.filterOperations.updateFilterOperator(
 						filterIdMap,
-						operator
+						operator,
 					);
 				}}
 			/>
 
 			<FilterInput
 				filter={filter}
+				value={filter.filterValue}
 				onChange={(value) => {
-					// table.filterOperations.updateFilterFieldValue(
-					// 	filterIdMap,
-					// 	value
+					// console.log(
+					table.filterOperations.updateFilterFieldValue(
+						filterIdMap,
+						value,
+					);
 					// );
 				}}
 			/>

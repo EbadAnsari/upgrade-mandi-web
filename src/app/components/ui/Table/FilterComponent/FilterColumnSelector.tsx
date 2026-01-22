@@ -1,22 +1,22 @@
 "use client";
 
 import { useTable } from "@/app/hooks/useTableEditor";
-import { CommandInput } from "@/components/ui/command";
 import { ColumnTypes, Datatype } from "@/utils/filter/type";
 import { RowData } from "@tanstack/react-table";
 import { Calendar, List } from "lucide-react";
-import { BaseSelectorProps, Combobox } from "../../ComboBox";
+import { Combobox } from "../../select/ComboBox";
+import { Item, SelectProps } from "../../select/SelectBox";
 import { Schema } from "../../TableEditor";
 
-export interface FilterColumnSelectorProps<TData extends RowData>
-	extends Readonly<BaseSelectorProps<keyof ColumnTypes>> {
-	type: Datatype["name"];
-	// column: Schema<TData>[];
-	// selectedColumn?: Schema<TData>["id"];
-	// onSelect?: (value: string) => void;
-}
+export type FilterSelectProps<T extends string> = Readonly<
+	Omit<SelectProps<T>, "items" | "label" | "icon">
+>;
 
-function Icon({ type }: { type: Datatype["name"] }) {
+export type FilterColumnSelectorProps = FilterSelectProps<keyof ColumnTypes> & {
+	type: Datatype["type"];
+};
+
+function Icon({ type }: { type: Datatype["type"] }) {
 	switch (type) {
 		case "text":
 			return "T";
@@ -34,24 +34,18 @@ export default function FilterColumnSelector<TData extends RowData>({
 	error,
 	selected,
 	onChange,
-}: Readonly<FilterColumnSelectorProps<TData>>) {
+}: Readonly<FilterColumnSelectorProps>) {
 	const table = useTable();
-	const items = table.getAllColumns().map(({ columnDef }) => ({
-		value: columnDef.id!,
-		label: (columnDef as Schema<TData>).label,
-	}));
-
 	return (
 		<Combobox
-			onChange={onChange}
 			error={error}
-			items={items}
-			ComboInput={
-				<CommandInput
-					placeholder="Select Operator"
-					className="h-9"
-				/>
+			items={
+				table.getAllColumns().map(({ columnDef }) => ({
+					value: columnDef.id!,
+					label: (columnDef as Schema<TData>).label,
+				})) as Item<keyof ColumnTypes>[]
 			}
+			onChange={onChange}
 			icon={<Icon type={type} />}
 			selected={selected}
 			label="Select Column"

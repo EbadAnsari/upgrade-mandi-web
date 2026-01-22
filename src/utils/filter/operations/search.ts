@@ -24,7 +24,7 @@ export function __getFilterById(filter: Filter, id: FilterId): Filter | null {
 			filterIds.shift();
 			return getFilterById(
 				operation,
-				filterIds.join(FilterIdSeprator) as FilterId
+				filterIds.join(FilterIdSeprator) as FilterId,
 			);
 		}
 	}
@@ -43,7 +43,7 @@ export function forEach(filterTree: Filter, cb: (filter: Filter) => void) {
 export function isValidKey(
 	filterTree: Filter,
 	key: string,
-	map: Set<string> = new Set()
+	map: Set<string> = new Set(),
 ): boolean {
 	map.add(filterTree.filterId);
 	if (map.has(key)) return false;
@@ -51,4 +51,12 @@ export function isValidKey(
 		for (const operation of filterTree.operations)
 			if (!isValidKey(operation, key, map)) return false;
 	return true;
+}
+
+export function isLeafFilter(filter: Filter): boolean {
+	return !filter.logicalOperator;
+}
+
+export function isRootFilter(filter: Filter): boolean {
+	return filter.filterId === "root";
 }

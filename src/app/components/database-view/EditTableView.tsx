@@ -10,10 +10,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { DatePicker } from "../DatePicker";
-import { Combobox } from "../ui/ComboBox";
 import TableEditor from "../ui/TableEditor";
 
-import { CommandInput } from "@/components/ui/command";
 import { _columns, _data } from "./../../providers/data";
 
 export interface EditTableViewProps {}
@@ -96,16 +94,10 @@ export default function EditTableView({}: Readonly<EditTableViewProps>) {
 							<FormItem>
 								<FormLabel>Select Customer</FormLabel>
 								<FormControl>
-									<Combobox
+									{/* <Combobox
 										items={frameworks}
-										ComboInput={
-											<CommandInput
-												placeholder="Search framework..."
-												className="h-9"
-											/>
-										}
 										label="Select framework..."
-									/>
+									/> */}
 								</FormControl>
 								<FormMessage />
 							</FormItem>
@@ -118,23 +110,17 @@ export default function EditTableView({}: Readonly<EditTableViewProps>) {
 							<FormItem>
 								<FormLabel>Customer Location</FormLabel>
 								<FormControl>
-									<Combobox
+									{/* <Combobox
 										items={frameworks}
-										ComboInput={
-											<CommandInput
-												placeholder="Search framework..."
-												className="h-9"
-											/>
-										}
 										label="Select framework..."
-									/>
+									/> */}
 								</FormControl>
 								<FormMessage />
 							</FormItem>
 						)}
 					/>
 				</div>
-				<div className="bg-white p-4 rounded-lg border border-zinc-200">
+				<div className="bg-white p-4 border border-zinc-200 rounded-lg">
 					<TableEditor
 						schema={_columns}
 						data={_data}

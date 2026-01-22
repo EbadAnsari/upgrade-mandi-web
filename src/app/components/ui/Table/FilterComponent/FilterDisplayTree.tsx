@@ -1,13 +1,17 @@
+import { useTable } from "@/app/hooks/useTableEditor";
 import { Button } from "@/components/ui/button";
 import {
 	Filter,
 	FilterId,
 	FilterIdSeprator,
+	LogicalOperator,
 	LogicalOperatorArray,
 } from "@/utils/filter/type";
-import { Group, Plus } from "lucide-react";
-import SelectBox from "../../SelectBox";
+import { CornerDownRight, Plus } from "lucide-react";
+import { Combobox } from "../../select/ComboBox";
+import { Item } from "../../select/SelectBox";
 import { FilterDisplayLeaf } from "./FilterDisplayLeaf";
+import NotToggle from "./NotToggle";
 
 interface FilterDisplayTreeProps {
 	filter: Filter;
@@ -18,6 +22,7 @@ export function FilterDisplayTree({
 	filter,
 	parentId,
 }: FilterDisplayTreeProps) {
+	const table = useTable();
 	const currentParentId = parentId
 		? ((parentId + FilterIdSeprator + filter.filterId) as FilterId)
 		: filter.filterId;
@@ -32,24 +37,21 @@ export function FilterDisplayTree({
 		);
 
 	return (
-		<div className="flex">
-			<div className="mr-2">
-				<SelectBox
-					items={(() => {
-						const a = LogicalOperatorArray;
-						// debugger;
-						return LogicalOperatorArray.map((item) => ({
+		<div className="flex bg-zinc-200/50 p-2 border border-zinc-300 rounded-lg">
+			<div className="space-y-1 mr-2">
+				<Combobox
+					items={
+						LogicalOperatorArray.map((item) => ({
 							label: item,
 							value: item,
-						}));
-					})()}
+						})) as Item<LogicalOperator>[]
+					}
+					label="Logical Operator"
 					selected={filter.logicalOperator}
-					// defaultValue={filter.logicalOperator}
 				/>
-				{/* IBM Business Analyst */}
-				{/* IBM Generative Engineering */}
+				<NotToggle className="shadow-sm" />
 			</div>
-			<div className="space-y-2 bg-zinc-200/50 p-2 border border-zinc-300 rounded-lg">
+			<div className="flex flex-col gap-2">
 				{filter.operations.map((subFilter, index) => (
 					<FilterDisplayTree
 						key={index}
@@ -58,13 +60,14 @@ export function FilterDisplayTree({
 						filter={subFilter}
 					/>
 				))}
-				<div className="flex gap-3">
+				<div className="flex gap-3 add-button">
 					<Button
 						// role="combobox"
 						variant="secondary"
 						size="sm"
 						onClick={(event) => {
 							event.preventDefault();
+							table.filterOperations.addFilter({}, "AND", "diff");
 						}}
 					>
 						<Plus />
@@ -78,8 +81,7 @@ export function FilterDisplayTree({
 							event.preventDefault();
 						}}
 					>
-						<Group />
-						{/* Add Group */}
+						<CornerDownRight />
 					</Button>
 				</div>
 			</div>

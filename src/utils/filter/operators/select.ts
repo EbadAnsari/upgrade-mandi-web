@@ -1,34 +1,38 @@
-import { Subset } from "@/utils/types";
+export class SelectType {
+	type = "select" as const;
+	storedDatatype: Map<string, boolean> = new Map();
 
-export class SelectType<U extends string> {
-	name = "select" as const;
-	storedDatatype: Subset<U>[] = [];
-	possibleValues: U[];
-	constructor(possibleValues: U[]) {
-		this.possibleValues = possibleValues;
+	constructor(storedDatatype: string[] = []) {
+		this.storedDatatype = SelectType.listToMap(storedDatatype);
+	}
+
+	static listToMap(selectedValues: string[] = []) {
+		return selectedValues.reduce((acc, curr) => {
+			acc.set(curr, false);
+			return acc;
+		}, new Map<string, boolean>());
 	}
 }
 
 export enum SelectOperators {
-	"is" = "is",
-	"isNot" = "is not",
+	"contains" = "contains",
 }
 
-export interface SelectOperation<U extends string> {
-	type: SelectType<U>;
+export interface SelectOperation {
+	type: SelectType["type"];
 	operator: SelectOperators;
-	filterValue: SelectType<U>["storedDatatype"];
+	filterValue: SelectType["storedDatatype"];
 }
 
-export function evalStatus<U extends string>(
-	fieldValue: Subset<U>,
+export function evalStatus(
+	fieldValue: string,
 	operator: SelectOperators,
-	filterValue: SelectType<U>["storedDatatype"]
+	filterValue: SelectType["storedDatatype"]
 ): boolean {
 	switch (operator) {
-		case SelectOperators.is:
-			return filterValue.includes(fieldValue);
-		case SelectOperators.isNot:
-			return !filterValue.includes(fieldValue);
+		case SelectOperators.contains:
+			return !!filterValue.get(fieldValue);
+		// case SelectOperators.isNot:
+		// 	return !filterValue.has(fieldValue);
 	}
 }

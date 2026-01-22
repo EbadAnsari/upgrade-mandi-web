@@ -1,6 +1,15 @@
 export class NumberType {
-	name = "number" as const;
-	storedDatatype = 0;
+	type = "number" as const;
+	storedDatatype: number = 0;
+	possibleValues: number = 0;
+
+	constructor(possibleValues: number = 0) {
+		this.possibleValues = possibleValues;
+	}
+
+	static converter(value: string) {
+		return parseFloat(value);
+	}
 }
 
 export enum NumberOperators {
@@ -13,7 +22,7 @@ export enum NumberOperators {
 }
 
 export interface NumberOperation {
-	type: NumberType;
+	type: NumberType["type"];
 	operator: NumberOperators;
 	filterValue: NumberType["storedDatatype"];
 }
@@ -31,6 +40,8 @@ export function evalNumber(
 		throw new Error(
 			`"filterValue" should be numbers not (${typeof filterValue}) ${filterValue}`
 		);
+
+	console.log(fieldValue, operator, filterValue);
 
 	switch (operator) {
 		case NumberOperators.eq:

@@ -1,30 +1,26 @@
 import { Row } from "@tanstack/react-table";
-import { evalDate } from "./operators/date";
-import { evalNumber } from "./operators/number";
+import { evalNumber, NumberType } from "./operators/number";
 import { evalStatus } from "./operators/select";
 import { evalString } from "./operators/text";
-import { BinaryOperation, Filter } from "./type";
+import { BinaryOperation, Filter, FilterValueType } from "./type";
 
-function evaluate(
-	operation: BinaryOperation,
-	fieldValue: number | string | Date | boolean
-) {
+function evaluate(operation: BinaryOperation, fieldValue: FilterValueType) {
 	switch (operation.type) {
 		case "number":
 			return evalNumber(
 				parseFloat(`${fieldValue}`),
 				operation.operator,
-				operation.filterValue
+				NumberType.converter(operation.filterValue)
 			);
-		case "string":
+		case "text":
 			return evalString(
 				`${fieldValue}`,
 				operation.operator,
 				operation.filterValue,
 				operation.caseSensitive
 			);
-		case "date":
-			return evalDate(operation, new Date(`${fieldValue}`));
+		// case "date":
+		// 	return evalDate(operation, new Date(`${fieldValue}`));
 		case "select":
 			return evalStatus(
 				`${fieldValue}`,

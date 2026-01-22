@@ -8,24 +8,25 @@ import {
 import { NumberOperators } from "@/utils/filter/operators/number";
 import { SelectOperators } from "@/utils/filter/operators/select";
 import { TextOperators } from "@/utils/filter/operators/text";
-import { Datatype, Operators } from "@/utils/filter/type";
+import { Datatype } from "@/utils/filter/type";
 import { extractValuesFromEnum } from "@/utils/utils";
-import { BaseSelectorProps, Combobox } from "../../ComboBox";
+import { Combobox } from "../../select/ComboBox";
+import { Item } from "../../select/SelectBox";
+import { FilterSelectProps } from "./FilterColumnSelector";
 
-interface FilterOperatorSelectorProps<T> extends BaseSelectorProps<T> {
-	type: Datatype;
-	col: string;
+interface FilterOperatorSelectorProps<T extends string>
+	extends FilterSelectProps<T> {
+	type: Datatype["type"];
 }
 
-export function FilterOperatorSelector({
+export function FilterOperatorSelector<T extends string>({
 	type,
 	selected,
 	error,
-	col,
 	onChange,
-}: FilterOperatorSelectorProps<Operators>) {
+}: FilterOperatorSelectorProps<T>) {
 	const getOperators: {
-		[key in FilterOperatorSelectorProps<Operators>["type"]["name"]]: string[];
+		[key in FilterOperatorSelectorProps<T>["type"]]: string[];
 	} = {
 		text: extractValuesFromEnum(TextOperators),
 		number: extractValuesFromEnum(NumberOperators),
@@ -37,17 +38,16 @@ export function FilterOperatorSelector({
 		],
 		// boolean: [],
 	};
-
-	console.log(getOperators[type.name], type.name);
-
 	return (
 		<Combobox
 			error={error}
 			onChange={onChange}
-			items={getOperators[type.name].map((operator) => ({
-				value: operator,
-				label: operator,
-			}))}
+			items={
+				getOperators[type].map((operator) => ({
+					value: operator,
+					label: operator,
+				})) as Item<T>[]
+			}
 			selected={selected}
 			label="Select Operator"
 		/>
